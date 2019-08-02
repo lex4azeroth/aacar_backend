@@ -1,0 +1,41 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.promservice.mappers.RUserCouponMapper">
+	<resultMap id="rUserCouponResultMap" type="com.aawashcar.promservice.entities.RUserCoupon">
+		<id column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="coupon_id" property="couponId" />
+		<result column="created_time" property="createdTime" />
+		<result column="enabled" property="enabled" />
+	</resultMap>
+
+	<insert id="addRUserCoupon" parameterType="com.aawashcar.promservice.entities.RUserCoupon">
+		insert into prom_r_user_coupon
+		(user_id, coupon_id)
+		values
+		(#{userId}, #{couponId}) 
+		<selectKey keyProperty="id" resultType="java.lang.Integer">
+			select LAST_INSERT_ID() as id
+      	</selectKey>
+	</insert>
+
+	<update id="disableRUserCouponById">
+		update prom_r_user_coupon set enabled=0 where user_id=#{userId} and coupon_id=#{couponId} and enabled=1
+	</update>
+
+	<select id="listRUserCouponsByUserId" resultMap="rUserCouponResultMap" resultType="map">
+		select id, user_id, coupon_id, created_time, enabled from prom_r_user_coupon where user_id=#{userId}
+	</select>
+
+	<select id="findRUserCouponByUserId" resultMap="rUserCouponResultMap"
+		resultType="map">
+		select id, user_id, coupon_id, created_time, enabled from prom_r_user_coupon where id=#{id}
+	</select>
+	
+	<select id="findRUserCouponByUserIdAndCouponId" resultMap="rUserCouponResultMap"
+		resultType="map">
+		select id, user_id, coupon_id, created_time, enabled from prom_r_user_coupon where user_id=#{userId} and coupon_id=#{couponId} and enabled=1
+	</select>
+</mapper>

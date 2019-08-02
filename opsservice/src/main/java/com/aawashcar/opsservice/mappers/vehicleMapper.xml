@@ -1,0 +1,77 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.opsservice.mappers.VehicleMapper">
+	<resultMap id="vehicleResultMap" type="com.aawashcar.opsservice.entities.Vehicle">
+		<id column="id" property="id" />
+		<result column="license" property="license" />
+		<result column="brand_id" property="brandId" />
+		<result column="color" property="color" />
+		<result column="type_id" property="typeId" />
+		<result column="category_id" property="categoryId" />
+		<result column="default_location" property="defaultLocation" />
+		<result column="created_time" property="createdTime" />
+		<result column="enabled" property="enabled" />
+	</resultMap>
+
+	<insert id="addVehicle" parameterType="com.aawashcar.opsservice.entities.Vehicle">
+		insert into ops_vehicle
+		(license, brand_id, color, type_id, category_id, default_location, enabled)
+		values (
+		#{license}, #{brandId}, #{color}, #{typeId}, #{categoryId}, #{defaultLocation}, 1) 
+		<selectKey keyProperty="id" resultType="java.lang.Integer">
+			select LAST_INSERT_ID() as id
+		</selectKey>
+	</insert>
+
+	<select id="findVehicleByLicense" resultMap="vehicleResultMap"
+		resultType="map">
+		select id, license, brand_id, color, type_id,
+		category_id,
+		default_location, created_time, enabled from ops_vehicle where
+		license=#{license} and enabled=1
+	</select>
+	
+	<select id="findVehicleById" resultMap="vehicleResultMap"
+		resultType="map">
+		select id, license, brand_id, color, type_id,
+		category_id,
+		default_location, created_time, enabled from ops_vehicle where
+		id=#{id} and enabled=1
+	</select>
+
+	<select id="listVehicles" resultMap="vehicleResultMap"
+		resultType="map">
+		select id, license, brand_id, color, type_id,
+		category_id,
+		default_location, created_time, enabled from ops_vehicle where enabled=1
+	</select>
+	
+	<delete id="deleteVehicleByLicense">
+		delete from ops_vehicle where license=#{license}
+	</delete>
+	
+	<update id="updateVehicle" parameterType="com.aawashcar.opsservice.entities.Vehicle">
+		update ops_vehicle set 
+		<if test="license != null" >
+        	license=#{license}, 
+      	</if>
+		<if test="brandId != null" >
+        	brand_id=#{brandId}, 
+      	</if>
+      	<if test="color != null" >
+        	color=#{color}, 
+      	</if>
+      	<if test="typeId != null" >
+        	type_id=#{typeId}, 
+      	</if>
+      	<if test="categoryId != null" >
+        	category_id=#{categoryId}, 
+      	</if>
+      	<if test="defaultLocation != null" >
+        	default_location=#{defaultLocation}, 
+      	</if>
+      	id=#{id} where id=#{id} and enabled=1
+	</update>
+</mapper>

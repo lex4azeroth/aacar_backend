@@ -1,0 +1,38 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.opsservice.mappers.CountyMapper">
+	<resultMap id="countyResultMap" type="com.aawashcar.opsservice.entities.County">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="description" property="description" />
+		<result column="county_id" property="countyId" />
+		<result column="province_id" property="provinceId" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addCounty" parameterType="com.aawashcar.opsservice.entities.County">
+		insert into ops_county
+		(county_id, name, description, province_id) values (#{countyId},
+		#{name}, #{description}, #{provinceId})
+	</insert>
+
+	<delete id="deleteCountyById" parameterType="int">
+		delete from ops_county
+		where
+		county_id=#{countyId}
+	</delete>
+
+	<select id="findCountyById" resultMap="countyResultMap"
+		resultType="map">
+		select id, county_id, name, description, province_id,
+		created_time from ops_county where county_id = #{countyId}
+	</select>
+	
+	<select id="findCountyByName" resultMap="countyResultMap"
+		resultType="map">
+		select id, county_id, name, description, province_id,
+		created_time from ops_county where name = #{name}
+	</select>
+</mapper>

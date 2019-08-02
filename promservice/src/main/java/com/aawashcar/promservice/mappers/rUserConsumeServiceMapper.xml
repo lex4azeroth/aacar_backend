@@ -1,0 +1,32 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.promservice.mappers.RUserConsumeServiceMapper">
+	<resultMap id="rUserConsumeServiceResultMap" type="com.aawashcar.promservice.entities.RUserConsumeService">
+		<id column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="service_id" property="serviceId" />
+		<result column="promotion_id" property="promotionId" />
+		<result column="consumed_count" property="consumedCount" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addRUserConsumeService" parameterType="com.aawashcar.promservice.entities.RUserConsumeService">
+		insert into prom_r_user_consume_service 
+		(user_id, service_id, promotion_id, consumed_count) 
+		values 
+		(#{userId}, 
+		#{serviceId}, 
+		<!-- (select rps.service_id from prom_r_promotion_service rps where promotion_id = #{promotionId}),  -->
+		#{promotionId}, #{consumedCount}) 
+		<selectKey keyProperty="id" resultType="java.lang.Integer">
+			select LAST_INSERT_ID() as id
+      	</selectKey>
+	</insert>
+	
+	<select id="findRUserConsumeServiceById" resultMap="rUserConsumeServiceResultMap"
+		resultType="map">
+		select id, user_id, service_id, promotion_id, consumed_count, created_time from prom_r_user_consume_service where id=#{id}
+	</select>
+</mapper>

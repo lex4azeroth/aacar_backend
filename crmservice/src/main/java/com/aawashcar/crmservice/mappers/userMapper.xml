@@ -1,0 +1,211 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.crmservice.mappers.UserMapper">
+	<resultMap id="userResultMap" type="com.aawashcar.crmservice.entities.User">
+		<id column="id" property="id" />
+		<result column="worker_id" property="workerId" />
+		<result column="nick_name" property="nickName" />
+		<result column="last_name" property="lastName" />
+		<result column="first_name" property="firstName" />
+		<result column="gender_id" property="genderId" />
+		<result column="phone_number" property="phoneNumber" />
+		<result column="age" property="age" />
+		<result column="detail_location" property="detailLocation" />
+		<result column="province_id" property="provinceId" />
+		<result column="county_id" property="countyId" />
+		<result column="city_id" property="cityId" />
+		<result column="district_id" property="districtId" />
+		<result column="resi_quart_id" property="resiQuartId" />
+		<result column="created_time" property="createdTime" />
+		<result column="last_modified_time" property="lastModifiedTime" />
+		<result column="enabled" property="enabled" />
+	</resultMap>
+
+	<insert id="addUser" parameterType="com.aawashcar.crmservice.entities.User">
+		insert into crm_user
+		(worker_id, nick_name, last_name, first_name, gender_id, phone_number, age,
+		detail_location, province_id,
+		county_id, city_id, district_id,
+		resi_quart_id)
+		values
+		(#{workerId}, #{nickName}, #{lastName}, #{firstName},
+		#{genderId}, #{phoneNumber}, #{age},
+		#{detailLocation},
+		#{provinceId},
+		#{countyId}, #{cityId}, #{districtId}, #{resiQuartId}) 
+		<selectKey keyProperty="id" resultType="java.lang.Integer">
+			select LAST_INSERT_ID() as id
+      	</selectKey>
+	</insert>
+	
+	<insert id="addWorker" parameterType="com.aawashcar.crmservice.entities.User">
+		insert into crm_user 
+		(<if test="firstName != null" >
+        	first_name, 
+      	</if>
+      	<if test="lastName != null" >
+        	last_name, 
+      	</if>
+      	<if test="nickName != null" >
+        	nick_name, 
+      	</if>
+      	<if test="age != null" >
+        	age, 
+      	</if>
+      	worker_id, phone_number) 
+      	values 
+      	(<if test="firstName != null" >
+        	#{firstName}, 
+      	</if>
+      	<if test="lastName != null" >
+        	#{lastName}, 
+      	</if>
+      	<if test="nickName != null" >
+        	#{nickName}, 
+      	</if>
+      	<if test="age != null" >
+        	#{age}, 
+      	</if>
+      	#{workerId}, #{phoneNumber}) 
+      	<selectKey keyProperty="id" resultType="java.lang.Integer">
+			select LAST_INSERT_ID() as id
+      	</selectKey>
+	</insert>
+	
+	<update id="updateWorkerInfo" parameterType="com.aawashcar.crmservice.entities.User">
+		update crm_user set 
+		<if test="firstName != null" >
+        	first_name=#{firstName}, 
+      	</if>
+      	<if test="lastName != null" >
+        	last_name=#{lastName}, 
+      	</if>
+      	<if test="nickName != null" >
+        	nick_name=#{nickName}, 
+      	</if>
+      	<if test="age != null" >
+        	age=#{age}, 
+      	</if>
+		worker_id=#{workerId} where phone_number=#{phoneNumber} and enabled=1
+	</update>
+
+	<update id="updateUserStatusById">
+		update crm_user set enabled=#{enabled} where id=#{id}
+	</update>
+
+<!-- 	<update id="updateUserInfo" parameterType="com.aawashcar.crmservice.entities.User">
+		update crm_user set worker_id=#{workerId}, nick_name=#{nickName}, last_name=#{lastName}, first_name=#{firstName}, gender_id=#{genderId}, phone_number=#{phoneNumber}, age=#{age},
+		detail_location=#{detailLocation}, province_id=#{provinceId},
+		county_id=#{countyId}, city_id=#{cityId}, district_id=#{districtId},
+		resi_quart_id=#{resiQuartId} where id=#{id}
+	</update> -->
+	
+	<update id="updateUserInfo" parameterType="com.aawashcar.crmservice.entities.User">
+		update crm_user set 
+		<if test="nickName != null">
+			nick_name=#{nickName}, 
+		</if>
+		<if test="lastName != null">
+			last_name=#{lastName}, 
+		</if>
+		<if test="firstName != null">
+			first_name=#{firstName}, 
+		</if>
+		<if test="genderId != null">
+			gender_id=#{genderId}, 
+		</if>
+		<if test="phoneNumber != null">
+			phone_number=#{phoneNumber}, 
+		</if>
+		<if test="age != null">
+			age=#{age}, 
+		</if>
+		<if test="detailLocation != null">
+			detail_location=#{detailLocation}, 
+		</if>
+		<if test="provinceId != null">
+			province_id=#{provinceId}, 
+		</if>
+		<if test="countyId != null">
+			county_id=#{countyId}, 
+		</if>
+		<if test="cityId != null">
+			city_id=#{cityId}, 
+		</if>
+		<if test="districtId != null">
+			district_id=#{districtId}, 
+		</if>
+		<if test="resiQuartId != null">
+			resi_quart_id=#{resiQuartId}, 
+		</if>
+		last_modified_time=CURRENT_TIMESTAMP 
+		where id=#{id} and enabled=1
+	</update>
+		
+	<update id="updateUserPhoneNumber">
+		update crm_user set phone_number=#{phonenumber} where id=#{userid} and enabled=1
+	</update>
+
+	<select id="listUsers" resultMap="userResultMap" resultType="map">
+		select id, worker_id, 
+		nick_name, last_name, first_name, gender_id, phone_number,
+		age,
+		detail_location,
+		province_id,
+		county_id, city_id, district_id,
+		resi_quart_id,
+		created_time, last_modified_time, enabled from crm_user where worker_id = 0
+	</select>
+
+	<select id="findUserByUserId" resultMap="userResultMap"
+		resultType="map">
+		select id, worker_id, 
+		nick_name, last_name, first_name, gender_id,
+		phone_number,
+		age,
+		detail_location,
+		province_id,
+		county_id, city_id,
+		district_id,
+		resi_quart_id,
+		created_time, last_modified_time, enabled from
+		crm_user where
+		id=#{id}
+	</select>
+
+	<select id="findUserByPhoneNumber" resultMap="userResultMap"
+		resultType="map">
+		select id, worker_id, 
+		nick_name, last_name, first_name, gender_id,
+		phone_number,
+		age,
+		detail_location,
+		province_id,
+		county_id, city_id,
+		district_id,
+		resi_quart_id,
+		created_time, last_modified_time, enabled from
+		crm_user where
+		phone_number=#{phoneNumber}
+	</select>
+	
+	<delete id="deleteUserById">
+		delete from crm_user where id=#{id}
+	</delete>
+	
+	<update id="disableUserById">
+		update crm_user set enabled=0 where id=#{id}
+	</update>
+	
+	<select id="findOpenIdByPhoneNumber" resultType="String">
+		select ruu.open_id 
+		from crm_r_user_uuid as ruu left join crm_user as u on ruu.user_id = u.id 
+		where u.phone_number=#{phoneNumber}
+	</select>
+	
+	<select id="findUserIdByPhoneNumber" resultType="Integer">
+		select id from crm_user where phone_number=#{phoneNumber} and enabled=1
+	</select>
+</mapper>

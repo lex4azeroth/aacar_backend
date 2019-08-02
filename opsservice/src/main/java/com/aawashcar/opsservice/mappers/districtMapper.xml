@@ -1,0 +1,44 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.opsservice.mappers.DistrictMapper">
+	<resultMap id="districtResultMap" type="com.aawashcar.opsservice.entities.District">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="description" property="description" />
+		<result column="district_id" property="districtId" />
+		<result column="city_id" property="cityId" />
+		<result column="province_id" property="provinceId" />
+		<result column="county_id" property="countyId" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addDistrict" parameterType="com.aawashcar.opsservice.entities.District">
+		insert into ops_district
+		(district_id, name,
+		description, province_id, county_id, city_id) values (#{districtId},
+		#{name}, #{description},
+		#{provinceId}, #{countyId}, #{cityId})
+	</insert>
+
+	<delete id="deleteDistrictById" parameterType="int">
+		delete from ops_district where
+		district_id=#{districtId}
+	</delete>
+
+	<select id="findDistrictById" resultMap="districtResultMap" resultType="map">
+		select id, district_id, name, description, province_id, county_id, city_id, 
+		created_time from ops_district where district_id = #{districtId}
+	</select>
+
+	<select id="findDistrictByName" resultMap="districtResultMap" resultType="map">
+		select id, district_id, name, description, province_id, county_id, city_id, 
+		created_time from ops_district where name = #{name}
+	</select>
+	
+	<select id="listDistricts" resultMap="districtResultMap" resultType="map">
+		select id, district_id, name, description, province_id, county_id, city_id, 
+		created_time from ops_district where province_id = #{provinceId} and city_id = #{cityId}
+	</select>
+</mapper>

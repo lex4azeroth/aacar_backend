@@ -1,0 +1,41 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.opsservice.mappers.ServiceMapper">
+	<resultMap id="serviceResultMap" type="com.aawashcar.opsservice.entities.WashCarService">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="enabled" property="enabled" />
+		<result column="description" property="description" />
+		<result column="icon_url" property="iconUrl" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addService" parameterType="com.aawashcar.opsservice.entities.WashCarService">
+		insert into ops_service
+		(name, description, icon_url, enabled) values (#{name}, #{description}, #{iconUrl}, #{enabled})
+	</insert>
+
+	<update id="updateServiceStatus">
+		update ops_service set enabled=#{enabled} where id=#{id}
+	</update>
+	
+	<update id="updateServiceIconUrlById">
+		update ops_service set icon_url=#{iconUrl} where id=#{id}
+	</update>
+	
+	<select id="listServices" resultMap="serviceResultMap"
+		resultType="map">
+		select id, name, description, enabled, created_time from ops_service
+	</select>
+	
+	<select id="findServiceById" resultMap="serviceResultMap" resultType="map">
+		select id, name, description, enabled, created_time from ops_service where id=#{id}
+	</select>
+	
+	<select id="findOriginPrice" resultType="Double">
+		select price from ops_price where 
+		vehicle_type_id=#{vtId} and vehicle_category_id=#{vcId} and service_id=#{serviceId} and enabled=1
+	</select>
+</mapper>

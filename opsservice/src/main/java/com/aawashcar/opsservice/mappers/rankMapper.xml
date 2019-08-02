@@ -1,0 +1,37 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.opsservice.mappers.RankMapper">
+	<resultMap id="rankResultMap" type="com.aawashcar.opsservice.entities.Rank">
+		<id column="id" property="id" />
+		<result column="rank_id" property="rankId" />
+		<result column="name" property="name" />
+		<result column="description" property="description" />
+		<result column="score" property="score" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addRank" parameterType="com.aawashcar.opsservice.entities.Province">
+		insert into ops_rank
+		(rank_id, name, description, score) values (#{rankId}, #{name},
+		#{description}, #{score})
+	</insert>
+
+	<delete id="deleteRankById" parameterType="int">
+		delete from ops_rank
+		where
+		rank_id=#{rankId}
+	</delete>
+
+	<select id="findRankById" resultMap="rankResultMap" resultType="map">
+		select id, rank_id, name, description, score, created_time
+		from
+		ops_rank where rank_id = #{rankId}
+	</select>
+
+	<update id="updateRankScore" parameterType="int">
+		update ops_rank set
+		score=#{score} where rank_id=#{rankId}
+	</update>
+</mapper>

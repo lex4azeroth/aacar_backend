@@ -1,0 +1,45 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.opsservice.mappers.VehicleTypeMapper">
+	<resultMap id="vehicleTypeResultMap" type="com.aawashcar.opsservice.entities.VehicleType">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="description" property="description" />
+		<result column="created_time" property="createdTime" />
+		<result column="enabled" property="enabled" />
+	</resultMap>
+
+	<insert id="addVehicleType" parameterType="com.aawashcar.opsservice.entities.VehicleType">
+		insert into
+		ops_vehicle_type
+		(type_id, name, description, enabled)
+		values (
+		#{name},
+		#{description}, 1)
+	</insert>
+
+	<select id="listVehicleTypes" resultMap="vehicleTypeResultMap"
+		resultType="map">
+		select id, name, description, created_time from
+		ops_vehicle_type where enabled=1
+	</select>
+	
+	<select id="findVehicleTypeById" resultMap="vehicleTypeResultMap"
+		resultType="map">
+		select id, name, description, created_time from
+		ops_vehicle_type where enabled=1 and id=#{id}
+	</select>
+	
+	<select id="findTypeByVehicleId" resultMap="vehicleTypeResultMap" 
+		resultType="map">
+		select t.id, t.name, t.description, t.created_time from 
+		ops_vehicle_type as t left join ops_vehicle as v on t.id = v.type_id where 
+		v.id=#{vehicleId} and v.enabled = 1
+	</select>
+
+	<delete id="deleteVehicleTypeById">
+		delete from ops_vehicle_type where id=#{id}
+	</delete>
+</mapper>

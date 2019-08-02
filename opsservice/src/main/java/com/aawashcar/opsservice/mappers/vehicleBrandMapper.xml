@@ -1,0 +1,31 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.opsservice.mappers.VehicleBrandMapper">
+	<resultMap id="vehicleBrandResultMap"
+		type="com.aawashcar.opsservice.entities.VehicleBrand">
+		<id column="id" property="id" />
+		<result column="brand" property="brand" />
+		<result column="nick_name" property="nickName" />
+		<result column="description" property="description" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addVehicleBrand" parameterType="com.aawashcar.opsservice.entities.VehicleBrand">
+		insert into
+		ops_vehicle_brand
+		(brand, nick_name, description)
+		values (#{brand},
+		#{nickName}, #{description})
+	</insert>
+
+	<select id="listVehicleBrands" resultMap="vehicleBrandResultMap"
+		resultType="map">
+		select id, brand, nick_name, description, created_time from ops_vehicle_brand
+	</select>
+
+	<delete id="deleteVehicleBrandById">
+		delete from ops_vehicle_brand where id=#{id}
+	</delete>
+</mapper>

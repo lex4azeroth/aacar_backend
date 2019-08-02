@@ -1,0 +1,37 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.opsservice.mappers.ProvinceMapper">
+	<resultMap id="provinceResultMap" type="com.aawashcar.opsservice.entities.Province">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="description" property="description" />
+		<result column="province_id" property="provinceId" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addProvince" parameterType="com.aawashcar.opsservice.entities.Province">
+		insert into ops_province
+		(province_id, name, description) values (#{provinceId}, #{name},
+		#{description})
+	</insert>
+
+	<delete id="deleteProvinceById" parameterType="int">
+		delete from ops_province
+		where
+		province_id=#{provinceId}
+	</delete>
+
+	<select id="findProvinceById" resultMap="provinceResultMap"
+		resultType="map">
+		select id, province_id, name, description, created_time
+		from ops_province where province_id = #{provinceId}
+	</select>
+	
+	<select id="findProvinceByName" resultMap="provinceResultMap"
+		resultType="map">
+		select id, province_id, name, description, created_time
+		from ops_province where name = #{name}
+	</select>
+</mapper>

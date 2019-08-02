@@ -1,0 +1,62 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.promservice.mappers.PointsMapper">
+	<resultMap id="pointsResultMap" type="com.aawashcar.promservice.entities.Points">
+		<id column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="user_points" property="userPoints" />
+		<result column="exchange_rate" property="exchangeRate" />
+		<result column="last_modified_time" property="lastModifiedTime" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addPoints" parameterType="com.aawashcar.promservice.entities.Points">
+		insert into prom_points
+		(user_id, user_points)
+		values
+		(#{userId}, #{userPoints}) 
+		<selectKey keyProperty="id" resultType="java.lang.Integer">
+			select LAST_INSERT_ID() as id
+      	</selectKey>
+	</insert>
+
+	<update id="updateUserPoints" parameterType="com.aawashcar.promservice.entities.Points">
+		update prom_points set user_points=#{userPoints}, last_modified_time=CURRENT_TIMESTAMP 
+		where user_id=#{userId} and enabled=1
+	</update>
+	
+	<update id="plusPoints">
+		update prom_points set user_points= user_points + #{pointsToAdd} where user_id=#{userId} and enabled=1
+	</update>
+	
+	<update id="updatePointsOnly">
+		update prom_points set user_points=#{points} where user_id=#{userId} and enabled=1
+	</update>
+	
+	<update id="disableUserPoints">
+		update prom_points set enabled=0, last_modified_time=CURRENT_TIMESTAMP 
+		where user_id=#{userId} and enabled=1
+	</update>
+
+	<select id="listPoints" resultMap="pointsResultMap" resultType="map">
+		select id, user_id, user_points, exchange_rate, last_modified_time, created_time 
+		from 
+		prom_points
+	</select>
+
+	<select id="findPointsById" resultMap="pointsResultMap"
+		resultType="map">
+		select id, user_id, user_points, exchange_rate, last_modified_time, created_time 
+		from 
+		prom_points where id=#{id} and enabled=1
+	</select>
+	
+	<select id="findPointsByUserId" resultMap="pointsResultMap"
+		resultType="map">
+		select id, user_id, user_points, exchange_rate, last_modified_time, created_time 
+		from 
+		prom_points where user_id=#{userId} and enabled=1
+	</select>
+</mapper>

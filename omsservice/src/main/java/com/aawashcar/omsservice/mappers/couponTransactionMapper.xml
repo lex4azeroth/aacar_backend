@@ -1,0 +1,33 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.omsservice.mappers.CouponTransactionMapper">
+	<resultMap id="couponTransactionResultMap"
+		type="com.aawashcar.omsservice.entities.CouponTransaction">
+		<id column="id" property="id" />
+		<result column="coupon_id" property="couponId" />
+		<result column="user_id" property="userId" />
+		<result column="order_id" property="orderId" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addCouponTransaction"
+		parameterType="com.aawashcar.omsservice.entities.CouponTransaction">
+		insert into 
+		oms_coupon_transaction 
+		(coupon_id, user_id, order_id) 
+		values 
+		(#{couponId}, #{userId}, #{orderId})
+	</insert>
+
+	<select id="listCouponTransactions" resultMap="couponTransactionResultMap"
+		resultType="map">
+		select id, coupon_id, user_id, order_id, created_time from 
+		oms_coupon_transaction where enabled=1
+	</select>
+
+	<update id="disableCouponTransactionById">
+		update oms_coupon_transaction set enabled=0 where id=#{id}
+	</update>
+</mapper>

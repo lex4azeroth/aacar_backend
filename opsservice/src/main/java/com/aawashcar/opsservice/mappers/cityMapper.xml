@@ -1,0 +1,38 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.opsservice.mappers.CityMapper">
+	<resultMap id="cityResultMap" type="com.aawashcar.opsservice.entities.City">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="description" property="description" />
+		<result column="city_id" property="cityId" />
+		<result column="province_id" property="provinceId" />
+		<result column="county_id" property="countyId" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addCity" parameterType="com.aawashcar.opsservice.entities.City">
+		insert into ops_city
+		(city_id, name,
+		description, province_id, county_id) values (#{cityId},
+		#{name}, #{description},
+		#{provinceId}, #{countyId})
+	</insert>
+
+	<delete id="deleteCityById" parameterType="int">
+		delete from ops_city where
+		city_id=#{cityId}
+	</delete>
+
+	<select id="findCityById" resultMap="cityResultMap" resultType="map">
+		select id, city_id, name, description, province_id, county_id,
+		created_time from ops_city where city_id = #{cityId}
+	</select>
+	
+	<select id="findCityByName" resultMap="cityResultMap" resultType="map">
+		select id, city_id, name, description, province_id, county_id,
+		created_time from ops_city where name = #{name}
+	</select>
+</mapper>

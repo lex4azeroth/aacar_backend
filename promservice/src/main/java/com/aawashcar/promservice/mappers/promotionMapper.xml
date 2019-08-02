@@ -1,0 +1,142 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.promservice.mappers.PromotionMapper">
+	<resultMap id="promotionResultMap" type="com.aawashcar.promservice.entities.Promotion">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="description" property="description" />
+		<result column="price" property="price" />
+		<result column="duration" property="duration" />
+		<result column="created_time" property="createdTime" />
+		<result column="enabled" property="enabled" />
+	</resultMap>
+	
+	<resultMap id="promotionWithServiceResultMap" type="com.aawashcar.promservice.entities.PromotionWithServices">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="description" property="description" />
+		<result column="price" property="price" />
+		<result column="duration" property="duration" />
+		<result column="created_time" property="createdTime" />
+		<result column="enabled" property="enabled" />
+		<result column="service_id" property="serviceId" />
+		<result column="count" property="count" />
+		<result column="consumed_count" property="consumedCount" />
+		<result column="remaining_count" property="remainingCount" />
+	</resultMap>
+	
+	<insert id="addPromotion" parameterType="com.aawashcar.promservice.entities.Promotion">
+		insert into prom_promotion
+		(name, description, price, duration)
+		values
+		(#{name}, #{description}, #{price}, #{duration}) 
+		<selectKey keyProperty="id" resultType="java.lang.Integer">
+			select LAST_INSERT_ID() as id
+      	</selectKey>
+	</insert>
+
+	<update id="disablePromotionById">
+		update prom_promotion set enabled=0 where id=#{id}
+	</update>
+
+	<select id="listPromotions" resultMap="promotionResultMap" resultType="map">
+		select id, name, description, price, duration, enabled, created_time from prom_promotion
+	</select>
+	
+	<select id="listPromotionsWithServices" resultMap="promotionWithServiceResultMap" resultType="map">
+	
+<!-- 		SELECT p.id, p.name, p.description, p.price, p.duration, p.enabled, p.created_time, rps.service_id, rps.count  -->
+		SELECT p.id, p.name, p.description, p.duration, p.price, p.enabled, p.created_time, rps.service_id, rps.count, 
+        0 as consumed_count, rps.count as remaining_count 
+		FROM prom_promotion as p LEFT JOIN prom_r_promotion_service as rps 
+		ON p.id = rps.promotion_id WHERE p.enabled=1
+	</select>
+
+	<select id="findPromotionById" resultMap="promotionResultMap"
+		resultType="map">
+		select id, name, description, price, duration, enabled, created_time from prom_promotion 
+		where id=#{id}
+	</select>
+	
+	<select id="findServicesIdByPromotionId" resultType="java.lang.Integer">
+		select service_id from prom_r_promotion_service where promotion_id = #{id}
+	</select>
+	
+	<select id="listMyPromotions" resultMap="promotionResultMap" 
+		resultType="map">
+<!-- 		select p.id, p.name, p.description, p.duration, p.price, p.enabled, p.created_time from prom_promotion p 
+		left join prom_r_promotion_service rps on p.id = rps.promotion_id 
+        left join prom_r_user_consume_service rucs on p.id = rucs.promotion_id 
+		where rucs.user_id=#{userId} and p.enabled = 1 and (rucs.consumed_count - rps.count) &lt; 0 
+		and DATEDIFF(CURDATE(), rucs.created_time) &lt;= p.duration --> 
+		select distinct(p.id), p.name, p.description, p.duration, p.price, p.enabled, p.created_time from prom_promotion p 
+		left join prom_r_promotion_service rps on p.id = rps.promotion_id 
+        left join prom_r_user_consume_service rucs on p.id = rucs.promotion_id 
+		where rucs.user_id=#{userId} and p.enabled = 1 and (rucs.consumed_count - rps.count) &lt; 0 
+		<!-- and DATEDIFF(CURDATE(), rucs.created_time) &lt;= p.duration -->
+		and TIMESTAMPDIFF(MONTH, rucs.created_time, DATE_FORMAT(now(), '%Y-%m-%d')) &lt;= p.duration
+	</select>
+	
+	<select id="listMyPromotionsWithServices" resultMap="promotionWithServiceResultMap" 
+		resultType="map">
+<!-- 		select p.id, p.name, p.description, p.duration, p.price, p.enabled, p.created_time, rps.service_id, rps.count 
+		from prom_promotion p 
+		left join prom_r_promotion_service rps on p.id = rps.promotion_id 
+        left join prom_r_user_consume_service rucs on p.id = rucs.promotion_id 
+		where rucs.user_id=#{userId} and p.enabled = 1 and (rucs.consumed_count - rps.count) &lt; 0 
+		and DATEDIFF(CURDATE(), rucs.created_time) &lt;= p.duration  -->
+		select p.id, p.name, p.description, p.duration, p.price, p.enabled, p.created_time, rps.service_id, rps.count, 
+        rucs.consumed_count, (rps.count - rucs.consumed_count) as remaining_count 
+		from prom_promotion p 
+		left join prom_r_promotion_service rps on p.id = rps.promotion_id 
+        left join prom_r_user_consume_service rucs on p.id = rucs.promotion_id 
+		where rucs.user_id=#{userId} and p.enabled = 1 and (rucs.consumed_count - rps.count) &lt;= 0 
+		and rps.service_id = rucs.service_id 
+        <!-- and DATEDIFF(CURDATE(), rucs.created_time) &lt;= p.duration -->
+        and TIMESTAMPDIFF(MONTH, rucs.created_time, DATE_FORMAT(now(), '%Y-%m-%d')) &lt;= p.duration
+	</select>
+
+	<select id="listMyPromotionsWithServicesCount" resultMap="promotionWithServiceResultMap" 
+		resultType="map">
+<!-- 		select p.id, p.name, p.description, p.duration, p.price, p.enabled, p.created_time, rps.service_id, rps.count 
+		from prom_promotion p 
+		left join prom_r_promotion_service rps on p.id = rps.promotion_id 
+        left join prom_r_user_consume_service rucs on p.id = rucs.promotion_id 
+		where rucs.user_id=#{userId} and p.enabled = 1 and (rucs.consumed_count - rps.count) &lt; 0 
+		and DATEDIFF(CURDATE(), rucs.created_time) &lt;= p.duration  -->
+		select p.id, p.name, p.description, p.duration, p.price, p.enabled, p.created_time, rps.service_id, rps.count, 
+        rucs.consumed_count, (rps.count - rucs.consumed_count) as remaining_count 
+		from prom_promotion p 
+		left join prom_r_promotion_service rps on p.id = rps.promotion_id 
+        left join prom_r_user_consume_service rucs on p.id = rucs.promotion_id 
+		where rucs.user_id=#{userId} and p.enabled = 1 and (rucs.consumed_count - rps.count) &lt; 0 
+		and rps.service_id = rucs.service_id 
+        and TIMESTAMPDIFF(MONTH, rucs.created_time, DATE_FORMAT(now(), '%Y-%m-%d')) &lt;= p.duration
+	</select>
+		
+	<select id="listMyPromotionsByService" resultMap="promotionResultMap" 
+		resultType="map">
+		select p.id, p.name, p.description, p.duration, p.price, p.enabled, p.created_time from prom_promotion p 
+		left join prom_r_promotion_service rps on p.id = rps.promotion_id 
+        left join prom_r_user_consume_service rucs on p.id = rucs.promotion_id 
+		where rucs.user_id=#{userId} and p.enabled = 1 and (rucs.consumed_count - rps.count) &lt; 0 and rucs.service_id=#{serviceId} 
+		<!-- and DATEDIFF(CURDATE(), rucs.created_time) &lt;= p.duration  -->
+		and TIMESTAMPDIFF(MONTH, rucs.created_time, DATE_FORMAT(now(), '%Y-%m-%d')) &lt;= p.duration
+	</select>
+	
+	<select id="validatePromotion" resultType="Integer">
+		select rucs.id from prom_r_user_consume_service as rucs 
+		left join prom_promotion as p on rucs.promotion_id = p.id 
+		left join prom_r_promotion_service as rps on rucs.promotion_id = rps.promotion_id and rucs.service_id = rps.service_id 
+		where rucs.user_id=#{userId} and rucs.service_id=#{serviceId} and rucs.promotion_id=#{promotionId}
+		and (rucs.consumed_count - rps.count) &lt; 0 
+		and TIMESTAMPDIFF(MONTH, rucs.created_time, DATE_FORMAT(now(), '%Y-%m-%d')) &lt;= p.duration 
+		order by rucs.created_time limit 1
+	</select>
+	
+	<update id="consumePromtionService">
+		update prom_r_user_consume_service set consumed_count = consumed_count + 1 where user_id=#{userId} and promotion_id=#{promotionId} and service_id=#{serviceId}
+	</update>
+</mapper>

@@ -1,0 +1,27 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.omsservice.mappers.OrderSummaryMapper">
+	<resultMap id="orderSummaryResultMap" type="com.aawashcar.omsservice.entities.OrderSummary">
+		<id column="id" property="id" />
+		<result column="order_number" property="orderNumber" />
+		<result column="service_id" property="serviceId" />
+		<result column="detail_location" property="detailLocation" />
+		<result column="book_time" property="bookTime" />
+		<result column="order_time" property="orderTime" />
+		<result column="completed_time" property="completedTime" />
+		<result column="order_status" property="orderStatus" />
+		<result column="price" property="price" />
+		<result column="discounted_price" property="discountedPrice" />
+		<result column="remarks" property="remarks" />
+	</resultMap>
+	
+	<select id="listMyOrderSummary" resultMap="orderSummaryResultMap" resultType="map">
+		select 
+		o.id, o.order_number, o.service_id, o.book_time, o.detail_location, os.name as order_status, 
+		o.completed_time, o.price, o.discounted_price, o.order_time, o.remarks 
+		from oms_order as o left join oms_order_status as os on o.status_code = os.status_code 
+		where o.user_id=#{userId} order by o.order_time desc limit #{limit}
+	</select>
+</mapper>

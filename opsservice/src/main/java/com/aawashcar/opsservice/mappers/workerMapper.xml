@@ -1,0 +1,243 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.opsservice.mappers.WorkerMapper">
+	<resultMap id="workerResultMap" type="com.aawashcar.opsservice.entities.Worker">
+		<id column="id" property="id" />
+		<result column="first_name" property="firstName" />
+		<result column="last_name" property="lastName" />
+		<result column="nick_name" property="nickName" />
+		<result column="phone_number" property="phoneNumber" />
+		<result column="identity_id" property="identityId" />
+		<result column="level" property="levelId" />
+		<result column="level_name" property="level" />
+		<result column="enabled" property="enabled" />
+		<result column="gender" property="gender" />
+		<result column="is_busy" property="isBusy" />
+		<result column="created_time" property="createdTime" />
+		<result column="modified_time" property="modifiedTime" />
+	</resultMap>
+	
+	<resultMap id="workerOrderSummaryResultMap" type="com.aawashcar.opsservice.entities.WasherOrderSummary">
+		<id column="id" property="id" />
+		<result column="worker_id" property="workerId" />
+		<result column="timestamp" property="timestamp" />
+		<result column="order_id" property="orderId" />
+		<result column="order_number" property="orderNumber" />
+		<result column="status" property="status" />
+	</resultMap>
+
+	<insert id="addWorker" parameterType="com.aawashcar.opsservice.entities.Worker">
+		insert into ops_worker 
+		(first_name, last_name, nick_name, phone_number, identity_id, level, gender) 
+		values 
+		(#{firstName}, #{lastName}, #{nickName}, #{phoneNumber}, #{identityId}, #{level}, #{gender})
+	</insert>
+	
+	<insert id="applyAsWorker">
+		insert into ops_worker 
+		(phone_number, level, enabled, open_id) 
+		values 
+		(#{phoneNumber}, -1, 0, #{validId}) 
+	</insert>
+	
+	<select id="findWorkerIdByPhone" resultType="Integer">
+		select id from ops_worker where phone_number=#{phoneNumber}
+	</select>
+	
+	<select id="checkExists" resultType="Integer">
+		select id from ops_worker where phone_number=#{phoneNumber}
+	</select>
+
+	<delete id="deleteWorkerByIdentityId">
+		delete from 
+		ops_worker 
+		where 
+		identity_id=#{identityId}
+	</delete>
+
+	<select id="findWorkerByIdentityId" resultMap="workerResultMap"
+		resultType="map">
+		select w.id, w.first_name, w.last_name, w.nick_name, w.phone_number, w.identity_id, wl.name as level_name, w.level as level, w.enabled, 
+		w.created_time, w.gender, w.is_busy from ops_worker as w left join ops_worker_level as wl on w.level = wl.level 
+        where identity_id=#{identityId}
+	</select>	
+	
+	<select id="findWorkerById" resultMap="workerResultMap"
+		resultType="map">
+		select w.id, w.first_name, w.last_name, w.nick_name, w.phone_number, w.identity_id, wl.name as level_name, w.level as level, w.enabled, w.modified_time, 
+		w.created_time, w.gender, w.is_busy from ops_worker as w left join ops_worker_level as wl on w.level = wl.level 
+        where w.id=#{id};
+	</select>
+	
+	<select id="findWorkerByOrderId" resultMap="workerResultMap"
+		resultType="map">
+		select 
+		w.id, w.first_name, w.last_name, w.nick_name, w.phone_number, w.identity_id, 
+		wl.name as level_name, w.level as level, w.enabled, w.created_time, w.modified_time, w.gender, w.is_busy 
+		from mcw_aacar_ops.ops_worker as w left join mcw_aacar_ops.ops_worker_level as wl on w.level = wl.level 
+		left join mcw_aacar_ops.ops_r_worker_order as rwo on w.id = rwo.worker_id 
+        where rwo.order_id=#{id} and w.enabled=1 and wl.enabled=1
+	</select>
+	
+	<update id="disableWorkerById">
+		update ops_worker set enabled=0 where id=#{id}
+	</update>
+	
+	<update id="enableWorkerLevelById">
+		update ops_worker set enabled=1 where id=#{id}
+	</update>	
+
+	<select id="listWorkers" resultMap="workerResultMap" resultType="map">
+		select w.id, w.first_name, w.last_name, w.nick_name, w.phone_number, w.identity_id, wl.name as level_name, w.level as level, w.enabled, w.modified_time, 
+		w.created_time, w.gender, w.is_busy from ops_worker as w left join ops_worker_level as wl on w.level = wl.level 
+		where w.enabled = 1
+	</select>
+	
+	<select id="listBusyWorkers" resultMap="workerResultMap" resultType="map">
+		select w.id, w.first_name, w.last_name, w.nick_name, w.phone_number, w.identity_id, wl.name as level_name, w.level as level, w.enabled, w.modified_time, 
+		w.created_time, w.gender, w.is_busy from ops_worker as w left join ops_worker_level as wl on w.level = wl.level 
+		where w.is_busy = 1 and w.enabled = 1
+	</select>
+	
+	<select id="listEveryOnes" resultMap="workerResultMap" resultType="map">
+		select w.id, w.first_name, w.last_name, w.nick_name, w.phone_number, w.identity_id, wl.name as level_name, w.level as level, w.enabled, w.modified_time, 
+		w.created_time, w.gender, w.is_busy from ops_worker as w left join ops_worker_level as wl on w.level = wl.level 
+		where w.enabled = 1 or (w.enabled = 0 and w.level = -1)
+	</select>
+	
+	<select id="findAssingedOrder" resultType="Integer">
+		select order_id from mcw_aacar_ops.ops_r_worker_order as rwo where worker_id=#{id} and (status &gt;= 30 and status &lt; 40)
+	</select>
+	
+	<select id="findStatusByOrderIdAndWorkerId" resultType="Integer">
+		select status from ops_r_worker_order where worker_id=#{workerId} and order_id=#{orderId}
+	</select>
+
+	<select id="listCompletedWorkerOrderSummary" resultMap="workerOrderSummaryResultMap" resultType="map">
+		select id, worker_id, end_wash_time as timestamp, 
+		order_id, order_number, status from ops_r_worker_order 
+		where 
+		worker_id=#{workerId} and status=-10 and is_taken=1 order by end_wash_time desc limit #{size}
+	</select>
+
+	<select id="listUnCompletedWorkerOrderSummary" resultMap="workerOrderSummaryResultMap" resultType="map">
+		select id, worker_id, assigned_time as timestamp, 
+		order_id, order_number, status from ops_r_worker_order 
+		where 
+		worker_id=#{workerId} and status in (32, 36, 38) and is_taken=1 order by status desc limit #{size}
+	</select>
+
+	<select id="listAvailableWorkerOrderSummary" resultMap="workerOrderSummaryResultMap" resultType="map">
+		select id, worker_id, assigned_time as timestamp, 
+		order_id, order_number, status from ops_r_worker_order 
+		where 
+		worker_id=#{workerId} and status in (20, 32) and is_taken=0 order by assigned_time asc limit #{size}
+	</select>
+				
+	<update id="takeOrder">
+		update ops_r_worker_order set start_order_time=CURRENT_TIMESTAMP, remarks_id=#{remarksId}, status=36, 
+		is_taken=1 where worker_id=#{workerId} and order_id=#{orderId} and status=32
+	</update>
+
+	<update id="rejectOrder">
+		update ops_r_worker_order set remarks_id=#{remarksId}, status=20, 
+		is_taken=0 where worker_id=#{workerId} and order_id=#{orderId} and status=32
+	</update>
+	
+	<update id="arrivedOrder">
+		update ops_r_worker_order set end_wash_time=CURRENT_TIMESTAMP, remarks_id=#{remarksId}, status=38 
+		where worker_id=#{workerId} and order_id=#{orderId} and status=36
+	</update>
+
+	<update id="completeOrder">
+		update ops_r_worker_order set end_wash_time=CURRENT_TIMESTAMP, remarks_id=#{remarksId}, status=-10 
+		where worker_id=#{workerId} and order_id=#{orderId} and status=38
+	</update>
+	
+	<update id="cancelOrder">
+		update ops_r_worker_order set status=-1, is_taken=0 where worker_id=#{workerId} and order_id=#{orderId}
+	</update>
+	
+	<insert id="assignOrder">
+		insert into ops_r_worker_order (worker_id, order_id, order_number, assigned_time, is_taken, status) 
+		values (#{workerId}, #{orderId}, #{orderNumber}, CURRENT_TIMESTAMP, 1, 36)
+		<selectKey keyProperty="id" resultType="java.lang.Integer">
+			select LAST_INSERT_ID() as id
+		</selectKey>
+	</insert>
+
+	<insert id="rushOrder">
+		insert into ops_r_worker_order (worker_id, order_id, order_number, remarks_id, assigned_time, is_taken, status) 
+		values (#{workerId}, #{orderId}, #{orderNumber}, #{remarksId}, CURRENT_TIMESTAMP, 1, 36)
+		<selectKey keyProperty="id" resultType="java.lang.Integer">
+			select LAST_INSERT_ID() as id
+		</selectKey>
+	</insert>
+		
+	<select id="findExistingWorkerOrderR" resultType="Integer">
+		select id from ops_r_worker_order where order_id=#{orderId} and status=20
+	</select>
+	
+	<update id="assignRejectedOrder">
+		update ops_r_worker_order set status=36, is_taken=1, assigned_time=CURRENT_TIMESTAMP, worker_id=#{workerId} where id=#{rId}
+	</update>
+	
+	<update id="updateWorkerAsNewOne" parameterType="com.aawashcar.opsservice.entities.Worker">
+		update ops_worker set 
+		<if test="firstName != null" >
+        	first_name=#{firstName}, 
+      	</if>
+      	<if test="lastName != null" >
+        	last_name=#{lastName}, 
+      	</if>
+      	<if test="nickName != null" >
+        	nick_name=#{nickName}, 
+      	</if>
+      	<if test="gender != null" >
+        	gender=#{gender}, 
+      	</if>
+      	identity_id=#{identityId}, level=1, enabled=1, modified_time=CURRENT_TIMESTAMP where phone_number=#{phoneNumber}
+	</update>
+	
+	<update id="updateWorker" parameterType="com.aawashcar.opsservice.entities.Worker">
+		update ops_worker set 
+		<if test="firstName != null" >
+        	first_name=#{firstName}, 
+      	</if>
+      	<if test="lastName != null" >
+        	last_name=#{lastName}, 
+      	</if>
+      	<if test="nickName != null" >
+        	nick_name=#{nickName}, 
+      	</if>
+      	<if test="gender != null" >
+        	gender=#{gender}, 
+      	</if>
+      	<if test="phoneNumber != null" >
+        	phone_number=#{phoneNumber}, 
+      	</if>
+      	<if test="identityId != null" >
+        	identity_id=#{identityId}, 
+      	</if>
+      	<if test="levelId != null" >
+        	level=#{levelId}, 
+      	</if>
+      	<if test="enabled != null" >
+        	enabled=#{enabled}, 
+      	</if>
+      	<if test="isBusy != null" >
+        	is_busy=#{isBusy}, 
+      	</if>
+      	modified_time=CURRENT_TIMESTAMP where id=#{id}
+	</update>
+	
+	<update id="updateWorkerWorkingStatus">
+		update ops_worker set is_busy=#{isBusy}, modified_time=CURRENT_TIMESTAMP where id=#{workerId} and enabled=1
+	</update>
+	
+	<select id="queryOpenIdByPhoneNumber" resultType="String">
+		select open_id from ops_worker where phone_number=#{phoneNumber} and enabled=0 and level=-1
+	</select>
+</mapper>

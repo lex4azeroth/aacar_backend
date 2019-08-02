@@ -1,0 +1,33 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.omsservice.mappers.ServiceTransactionMapper">
+	<resultMap id="serviceTransactionResultMap"
+		type="com.aawashcar.omsservice.entities.ServiceTransaction">
+		<id column="id" property="id" />
+		<result column="service_id" property="serviceId" />
+		<result column="user_id" property="userId" />
+		<result column="order_id" property="orderId" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addServiceTransaction"
+		parameterType="com.aawashcar.omsservice.entities.ServiceTransaction">
+		insert into 
+		oms_service_transaction 
+		(service_id, user_id, order_id) 
+		values 
+		(#{serviceId}, #{userId}, #{orderId})
+	</insert>
+
+	<select id="listServiceTransactions" resultMap="serviceTransactionResultMap"
+		resultType="map">
+		select id, service_id, user_id, order_id, created_time from 
+		oms_service_transaction where enabled=1
+	</select>
+
+	<update id="disableServiceTransactionById">
+		update oms_service_transaction set enabled=0 where id=#{id}
+	</update>
+</mapper>

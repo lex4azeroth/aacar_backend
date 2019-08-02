@@ -1,0 +1,117 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.omsservice.mappers.OrderTransactionMapper">
+	<resultMap id="orderTransactionResultMap"
+		type="com.aawashcar.omsservice.entities.OrderTransaction">
+		<id column="id" property="id" />
+		<result column="order_id" property="orderId" />
+		<result column="amount" property="amount" />
+		<result column="pay_type" property="payType" />
+		<result column="bank_type" property="bankType" />
+		<result column="fee_type" property="feeType" />
+		<result column="is_subscribe" property="isSubscribe" />
+		<result column="mch_id" property="mchId" />
+		<result column="nonce_str" property="nonceStr" />
+		<result column="openid" property="openid" />
+		<result column="out_trade_no" property="outTradeNo" />
+		<result column="sign" property="sign" />
+		<result column="sub_mch_id" property="subMchId" />
+		<result column="time_end" property="timeEnd" />
+		<result column="total_fee" property="totalFee" />
+		<result column="trade_type" property="tradeType" />
+		<result column="transaction_id" property="transactionId" />
+		<result column="paied" property="paied" />
+		<result column="modified_time" property="modifiedTime" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addOrderTransaction" parameterType="com.aawashcar.omsservice.entities.OrderTransaction">
+		insert into
+		oms_order_transaction
+		(order_id, amount, pay_type, bank_type, fee_type, is_subscribe, mch_id, nonce_str, openid, out_trade_no, sign, 
+		sub_mch_id, time_end, total_fee, trade_type, transaction_id) values
+		(#{orderId}, #{amount}, #{payType}, #{bankType}, #{feeType}, #{isSubscribe}, #{mchId}, #{nonceStr}, #{openid}, 
+		#{outTradeNo}, #{sign}, #{subMchId}, #{timeEnd}, #{totalFee}, #{tradeType}, #{transactionId})
+	</insert>
+
+	<select id="listOrderTransactions" resultMap="orderTransactionResultMap"
+		resultType="map">
+		select id, order_id, amount, pay_type, bank_type, fee_type, is_subscribe, mch_id, nonce_str, openid, out_trade_no, sign, 
+		sub_mch_id, time_end, total_fee, trade_type, transaction_id, paied, modified_time, enabled 
+		from oms_order_transaction where enabled=1 order by created_time desc
+	</select>
+
+	<select id="findOrderTransactionByOrderId" resultMap="orderTransactionResultMap"
+		resultType="map">
+		select id, order_id, amount, pay_type, bank_type, fee_type, is_subscribe, mch_id, nonce_str, openid, out_trade_no, sign, 
+		sub_mch_id, time_end, total_fee, trade_type, transaction_id, paied, modified_time, enabled 
+		from oms_order_transaction where order_id=#{orderId}
+	</select>
+	
+	<update id="disableOrderTransactionByOrderId">
+			update oms_order_transaction set enabled=0 where order_id=#{orderId}
+	</update>
+	
+	<update id="updateOrderTransactionByOrderId" parameterType="com.aawashcar.omsservice.entities.OrderTransaction">
+		update oms_order_transaction set 
+		<if test="bankType != null" >
+        	bank_type=#{bankType}, 
+      	</if>
+      	<if test="feeType != null" >
+      		fee_type=#{feeType}, 
+      	</if>
+      	<if test="isSubscribe != null" >
+      		is_subscribe=#{isSubscribe}, 
+      	</if>
+      	<if test="mchId != null" >
+      		mch_id=#{mchId}, 
+      	</if>
+      	<if test="nonceStr != null" >
+      		nonce_str=#{nonceStr}, 
+      	</if>
+      	<if test="openid != null" >
+      		openid=#{openid}, 
+      	</if>
+      	<if test="outTradeNo != null" >
+      		out_trade_no=#{outTradeNo}, 
+      	</if>
+      	<if test="sign != null" >
+      		sign=#{sign}, 
+      	</if>
+      	<if test="subMchId != null" >
+      		sub_mch_id=#{subMchId}, 
+      	</if>
+      	<if test="timeEnd != null" >
+      		time_end=#{timeEnd}, 
+      	</if>
+      	<if test="totalFee != null" >
+      		total_fee=#{totalFee}, 
+      	</if>      	
+      	<if test="tradeType != null" >
+      		trade_type=#{tradeType}, 
+      	</if>
+      	<if test="transactionId != null" >
+      		transaction_id=#{transactionId}, 
+      	</if>
+      	<if test="payType != null" >
+      		pay_type=#{payType}, 
+      	</if>
+      	<if test="amount != null" >
+      		amount=#{amount}, 
+      	</if>
+      	<if test="paied != null" >
+      		paied=#{paied}, 
+      	</if>
+		modified_time=CURRENT_TIMESTAMP where order_id=#{orderId} and enabled=1
+	</update>
+	
+	<select id="findOrderTransactionId" resultType="Integer">
+		select id from oms_order_transaction where order_id=#{orderId}
+	</select>
+	
+	<update id="updateOrderTransactionAmount">
+		update oms_order_transaction set amount=#{amount} where id=#{id}
+	</update>
+</mapper>

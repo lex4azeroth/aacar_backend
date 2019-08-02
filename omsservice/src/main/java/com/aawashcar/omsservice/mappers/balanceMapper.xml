@@ -1,0 +1,29 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.omsservice.mappers.BalanceMapper">
+	<resultMap id="balanceResultMap" type="com.aawashcar.omsservice.entities.Balance">
+		<id column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="balance" property="balance" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addBalance" parameterType="com.aawashcar.omsservice.entities.Balance">
+		insert into oms_balance
+		(user_id, balance) values (#{userId},
+		#{balance})
+	</insert>
+	
+	<select id="findBalanceByUserId" resultMap="balanceResultMap"
+		resultType="map">
+		select id, user_id, balance, created_time from oms_balance where user_id=#{userId}
+	</select>
+
+	<delete id="deleteBalanceByUserId" parameterType="int">
+		delete from
+		oms_balance where
+		user_id=#{userId}
+	</delete>
+</mapper>

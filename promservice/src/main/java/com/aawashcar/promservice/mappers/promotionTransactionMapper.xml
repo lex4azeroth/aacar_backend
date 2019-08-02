@@ -1,0 +1,53 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.promservice.mappers.PromotionTransactionMapper">
+	<resultMap id="promotionTransactionResultMap"
+		type="com.aawashcar.promservice.entities.PromotionTransaction">
+		<id column="id" property="id" />
+		<result column="promotion_id" property="promotionId" />
+		<result column="price" property="price" />
+		<result column="user_id" property="userId" />
+		<result column="created_time" property="createdTime" />
+		<result column="enabled" property="enabled" />
+		<result column="paied" property="paied" />
+		<result column="modified_time" property="modifiedTime" />
+	</resultMap>
+
+	<insert id="addPromotionTransaction"
+		parameterType="com.aawashcar.promservice.entities.PromotionTransaction">
+		insert into
+		prom_promotion_transaction 
+		(promotion_id, price, user_id) 
+		values 
+		(#{promotionId}, #{price}, #{userId}) 
+		<selectKey keyProperty="id" resultType="java.lang.Integer">
+			select LAST_INSERT_ID() as id
+      	</selectKey>
+	</insert>
+
+	<select id="listPromotionTransactions" resultMap="promotionTransactionResultMap"
+		resultType="map">
+		select id, promotion_id, price, user_id, created_time, paied, enabled, modified_time from 
+		prom_promotion_transaction where enabled=1
+	</select>
+	
+	<select id="findPromotionTransactionById" resultMap="promotionTransactionResultMap"
+		resultType="map">
+		select id, promotion_id, price, user_id, created_time, paied, enabled, modified_time from 
+		prom_promotion_transaction where enabled=1 and paied=0 and id=#{id}
+	</select>
+	
+	<select id="findPromotionTransactionIdByUserAndPromotionId" resultType="Integer">
+		select id from prom_promotion_transaction where enabled=1 and paied=0 and user_id=#{userId} and price=#{price} and promotion_id=#{promotionId}
+	</select>
+	
+	<update id="disablePromotionTransactionById">
+		update prom_promotion_transaction set enabled=0 where id=#{id}
+	</update>
+	
+	<update id="completePromotionTransaction">
+		update prom_promotion_transaction set paied=1, price=#{price}, modified_time=CURRENT_TIMESTAMP where id=#{id}
+	</update>
+</mapper>

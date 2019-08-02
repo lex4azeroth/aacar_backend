@@ -1,0 +1,41 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.opsservice.mappers.PriceMapper">
+	<resultMap id="priceResultMap" type="com.aawashcar.opsservice.entities.Price">
+		<id column="id" property="id" />
+		<result column="vehicle_type_id" property="vehicleTypeId" />
+		<result column="vehicle_category_id" property="vehicleCategoryId" />
+		<result column="service_id" property="serviceId" />
+		<result column="price" property="price" />
+		<result column="enabled" property="enabled" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addPrice" parameterType="com.aawashcar.opsservice.entities.Price">
+		insert into ops_price
+		(vehicle_type_id, vehicle_category_id, service_id, price, enabled) values
+		(#{vehicleTypeId},
+		#{vehicleCategoryId}, #{serviceId}, #{price},
+		#{enabled})
+	</insert>
+
+	<update id="updatePriceOnly">
+		update ops_price set price=#{price} where id=#{id}
+	</update>
+
+	<update id="updatePriceStatus">
+		update ops_price set enabled=#{enabled} where id=#{id}
+	</update>
+
+	<select id="listPrices" resultMap="priceResultMap" resultType="map">
+		select id, vehicle_type_id, vehicle_category_id, service_id, price, enabled,
+		created_time from ops_price where enabled=true
+	</select>
+	
+	<select id="getPrice" resultMap="priceResultMap" resultType="map">
+		select id, vehicle_type_id, vehicle_category_id, service_id, price, enabled,
+		created_time from ops_price where service_id=#{serviceId} and vehicle_type_id=#{vehicleTypeId} and vehicle_category_id=#{vehicleCategoryId} and enabled=true
+	</select>
+</mapper>

@@ -1,0 +1,50 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.crmservice.mappers.RUserUuidMapper">
+	<resultMap id="rUserUuidResultMap" type="com.aawashcar.crmservice.entities.RUserUuid">
+		<id column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="uuid" property="uuid" />
+		<result column="open_id" property="openId" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addUserUuidPair" parameterType="com.aawashcar.crmservice.entities.RUserUuid">
+		insert into
+		crm_r_user_uuid
+		(user_id, uuid, open_id)
+		values
+		(#{userId}, #{uuid}, #{openId})
+	</insert>
+	
+	<select id="checkExists" resultType="Integer">
+		select id from crm_r_user_uuid where open_id=#{validid}
+	</select>
+	
+	<insert id="applyAsWorker">
+		insert into
+		crm_r_user_uuid
+		(user_id, open_id)
+		values
+		(-100,  #{validid})
+	</insert>
+	
+	<select id="findIdByOpenId" resultType="Integer">
+		select id from crm_r_user_uuid where open_id=#{validid}
+	</select>
+
+	<select id="findRUserUuidByUuid" resultMap="rUserUuidResultMap" resultType="map">
+		select id, user_id, uuid, open_id, created_time from crm_r_user_uuid where uuid=#{uuid}
+	</select>
+	
+	<select id="findRUserUuidByOpenId" resultMap="rUserUuidResultMap" resultType="map">
+		select id, user_id, uuid, open_id, created_time from crm_r_user_uuid where open_id=#{openId}
+	</select>
+	
+	<update id="approvedAsWorker">
+		update crm_r_user_uuid 
+		set user_id=#{userid} where open_id=#{validid}
+	</update>
+</mapper>

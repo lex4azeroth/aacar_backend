@@ -1,0 +1,39 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.omsservice.mappers.OrderStatusMapper">
+	<resultMap id="orderStatusResultMap" type="com.aawashcar.omsservice.entities.OrderStatus">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="description" property="description" />
+		<result column="status_code" property="statusCode" />
+		<result column="enabled" property="enabled" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addOrderStatus" parameterType="com.aawashcar.omsservice.entities.OrderStatus">
+		insert into
+		oms_order_status
+		(name, description, status_code, enabled) values
+		(#{name}, #{description}, #{statusCode}, #{enabled})
+	</insert>
+
+	<select id="listOrderStatus" resultMap="orderStatusResultMap"
+		resultType="map">
+		select id, name, description, status_code, enabled,
+		created_time from oms_order_status
+	</select>
+	
+	<select id="findOrderStatusNameByCode" resultType="String">
+		select name from oms_order_status where enabled = 1 and status_code=#{statusCode}
+	</select>
+	
+	<update id="updateOrderStatusEnabledByCode">
+		update oms_order_status set enabled=#{enabled} where status_code=#{statusCode}
+	</update>
+	
+	<delete id="deleteOrderStatusByCode">
+		delete from oms_order_status where status_code=#{statusCode}
+	</delete>
+</mapper>

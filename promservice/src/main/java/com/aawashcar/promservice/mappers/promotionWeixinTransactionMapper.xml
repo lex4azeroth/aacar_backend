@@ -1,0 +1,45 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.promservice.mappers.PromotionWeixinTransactionMapper">
+	<resultMap id="promotionWeixinTransactionResultMap"
+		type="com.aawashcar.promservice.entities.PromotionWeixinTransaction">
+		<id column="id" property="id" />
+		<result column="promotion_id" property="promotionId" />
+		<result column="user_id" property="userId" />
+		<result column="appid" property="appid" />
+		<result column="attach" property="attach" />
+		<result column="bank_type" property="bank_type" />
+		<result column="fee_type" property="fee_type" />
+		<result column="is_subscribe" property="is_subscribe" />
+		<result column="mch_id" property="mch_id" />
+		<result column="nonce_str" property="nonce_str" />
+		<result column="openid" property="openid" />
+		<result column="out_trade_no" property="out_trade_no" />
+		<result column="result_code" property="result_code" />
+		<result column="return_code" property="return_code" />
+		<result column="sign" property="sign" />
+		<result column="sub_mch_id" property="sub_mch_id" />
+		<result column="time_end" property="time_end" />
+		<result column="total_fee" property="total_fee" />
+		<result column="trade_type" property="trade_type" />
+		<result column="transaction_id" property="transaction_id" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addPromotionWeixinTransaction"
+		parameterType="com.aawashcar.promservice.entities.PromotionWeixinTransaction">
+		insert into 
+		prom_promotion_weixin_transaction 
+		(promotion_id, user_id, appid, attach, bank_type, fee_type, is_subscribe, mch_id, nonce_str, openid, 
+		out_trade_no, result_code, return_code, sign, sub_mch_id, time_end, total_fee, trade_type, transaction_id) 
+		values 
+		(#{promotionId}, #{userId}, #{appid}, #{attach}, #{bank_type}, #{fee_type}, #{is_subscribe}, #{mch_id}, 
+		#{nonce_str}, #{openid}, #{out_trade_no}, #{result_code}, #{return_code}, #{sign}, #{sub_mch_id}, #{time_end}, 
+		#{total_fee}, #{trade_type}, #{transaction_id}) 
+		<selectKey keyProperty="id" resultType="java.lang.Integer">
+			select LAST_INSERT_ID() as id
+      	</selectKey>
+	</insert>
+</mapper>

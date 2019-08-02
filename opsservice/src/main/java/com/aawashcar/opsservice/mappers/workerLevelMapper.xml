@@ -1,0 +1,39 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.opsservice.mappers.WorkerLevelMapper">
+	<resultMap id="workerLevelResultMap" type="com.aawashcar.opsservice.entities.WorkerLevel">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="description" property="description" />
+		<result column="level" property="level" />
+		<result column="enabled" property="enabled" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addWorkerLevel" parameterType="com.aawashcar.opsservice.entities.WorkerLevel">
+		insert into
+		ops_worker_level
+		(name, level, description) values (#{name}, #{level}, #{description})
+	</insert>
+	
+	<select id="findWorkerLevelById" resultMap="workerLevelResultMap" resultType="map">
+		select id, name, description, level, enabled, createdTime 
+		from ops_worker_level where id=#{id} and enabled=1
+	</select>
+	
+	<select id="listWorkerLevels" resultMap="workerLevelResultMap" resultType="map">
+		select id, name, description, level, enabled, createdTime 
+		from ops_worker_level where id=#{id}
+	</select>
+	
+	<update id="disableWorkerLevelById">
+		update ops_worker_level set enabled=0 where id=#{id}
+	</update>
+	
+	<update id="enableWorkerLevelById">
+		update ops_worker_level set enabled=1 where id=#{id}
+	</update>	
+	
+</mapper>

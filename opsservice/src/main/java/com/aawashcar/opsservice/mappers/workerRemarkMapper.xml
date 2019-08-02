@@ -1,0 +1,18 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.opsservice.mappers.WorkerRemarkMapper">
+	<resultMap id="workerRemarkResultMap"
+		type="com.aawashcar.opsservice.entities.WorkerRemark">
+		<id column="id" property="id" />
+		<result column="content" property="content" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addWorkerRemark" parameterType="com.aawashcar.opsservice.entities.WorkerRemark">
+		insert into
+		ops_worker_remark
+		(content) values (#{content})
+	</insert>
+</mapper>

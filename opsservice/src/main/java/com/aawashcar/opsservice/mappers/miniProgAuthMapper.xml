@@ -1,0 +1,35 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.opsservice.mappers.MiniProgAuthMapper">
+	<resultMap id="miniProgAuthResultMap" type="com.aawashcar.opsservice.entities.MiniAuthEntity">
+		<id column="id" property="id" />
+		<result column="mini_name" property="name" />
+		<result column="secret" property="secret" />
+		<result column="app_id" property="appId" />
+		<result column="enabled" property="enabled" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addMiniProgAuth" parameterType="com.aawashcar.opsservice.entities.MiniAuthEntity">
+		insert into ops_miniprog_auth
+		(mini_name, secret, app_id) 
+		values 
+		(#{name}, #{secret}, #{appId})
+		
+		<selectKey keyProperty="id" resultType="java.lang.Integer">
+			select LAST_INSERT_ID() as id
+		</selectKey>
+	</insert>
+
+	<select id="findMiniAuthByName" resultMap="miniProgAuthResultMap" resultType="map">
+		select id, mini_name, secret, app_id, enabled, created_time 
+		from ops_miniprog_auth where mini_name=#{name} and enabled = 1
+	</select>
+	
+	<update id="disableMiniAuthById" >
+		update ops_miniprog_auth
+		set enabled = 0 where id=#{id}
+	</update>
+</mapper>

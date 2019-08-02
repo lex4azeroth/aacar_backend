@@ -1,0 +1,319 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.omsservice.mappers.OrderMapper">
+	<resultMap id="orderResultMap" type="com.aawashcar.omsservice.entities.Order">
+		<id column="id" property="id" />
+		<result column="order_number" property="orderNumber" />
+		<result column="user_id" property="userId" />
+		<result column="service_id" property="serviceId" />
+		<result column="vehicle_id" property="vehicleId" />
+		<result column="detail_location" property="detailLocation" />
+		<result column="book_time" property="bookTime" />
+		<result column="order_time" property="orderTime" />
+		<result column="completed_time" property="completedTime" />
+		<result column="status_code" property="statusCode" />
+		<result column="status" property="status" />
+		<result column="remarks" property="remarks" />
+		<result column="price" property="price" />
+		<result column="invoice_status" property="invoiceStatus" />
+		<result column="discounted_price" property="discountedPrice" />
+		<result column="province_id" property="provinceId" />
+		<result column="county_id" property="countyId" />
+		<result column="city_id" property="cityId" />
+		<result column="district_id" property="districtId" />
+		<result column="resi_quart_id" property="resiQuartId" />
+		<result column="location_id" property="locationId" />
+		<result column="promotion_id" property="promotionId" />
+		<result column="coupon_id" property="couponId" />
+		<result column="operator_id" property="operatorId" />
+		<result column="created_time" property="createdTime" />
+		<result column="order_phone_number" property="orderPhoneNumber" />
+		<result column="store_id" property="storeId" />
+		<result column="cap_type_id" property="capabilityType" />
+	</resultMap>
+
+	<insert id="addOrder" parameterType="com.aawashcar.omsservice.entities.Order">
+		insert into oms_order
+		(order_number, user_id, service_id, vehicle_id, detail_location,
+		book_time, order_time, completed_time, status_code, remarks, price,
+		invoice_status,
+		discounted_price, province_id, county_id, city_id,
+		district_id, resi_quart_id, location_id, promotion_id, coupon_id, order_phone_number, cap_type_id
+		<if test="storeId != null" >
+      	    , store_id
+      	</if>
+      	)
+		values (#{orderNumber}, #{userId},
+		#{serviceId}, #{vehicleId},
+		#{detailLocation},
+		#{bookTime}, #{orderTime}, 
+		#{completedTime}, #{statusCode}, #{remarks}, #{price},
+		#{invoiceStatus},
+		#{discountedPrice}, #{provinceId}, #{countyId},
+		#{cityId}, #{districtId}, #{resiQuartId}, #{locationId}, #{promotionId}, #{couponId}, #{orderPhoneNumber}, #{capabilityType}
+		<if test="storeId != null" >
+      	    , #{storeId}
+      	</if>
+      	) 
+		<selectKey keyProperty="id" resultType="java.lang.Integer">
+			select LAST_INSERT_ID() as id
+		</selectKey>
+	</insert>
+	
+	<select id="listAvailableOrders" resultMap="orderResultMap"
+		resultType="map">
+		select o.id, o.order_number, o.user_id, o.service_id, o.vehicle_id, 
+		o.detail_location, 
+		o.book_time, o.order_time, o.completed_time, o.status_code, os.name as status, o.remarks, 
+		o.price, o.invoice_status, 
+		o.discounted_price, o.province_id, o.county_id, 
+		o.city_id, o.district_id, 
+		o.resi_quart_id, o.location_id, o.promotion_id, o.coupon_id, o.operator_id, o.created_time, o.order_phone_number, 
+		o.cap_type_id, o.store_id 
+		from oms_order as o left join oms_order_status as os on o.status_code=os.status_code 
+		where o.status_code=20 and DATEDIFF(CURDATE(), o.created_time) &lt;= 3 order by o.book_time desc limit #{size}
+	</select>
+
+	<select id="findOrderByOrderNumber" resultMap="orderResultMap"
+		resultType="map">
+		select o.id, o.order_number, o.user_id, o.service_id, o.vehicle_id, 
+		o.detail_location, 
+		o.book_time, o.order_time, o.completed_time, o.status_code, os.name as status, o.remarks, 
+		o.price, o.invoice_status, 
+		o.discounted_price, o.province_id, o.county_id, 
+		o.city_id, o.district_id, 
+		o.resi_quart_id, o.location_id, o.promotion_id, o.coupon_id, o.operator_id, o.created_time, o.order_phone_number, 
+		o.cap_type_id, o.store_id 
+		from oms_order as o left join oms_order_status as os on o.status_code=os.status_code 
+		where o.order_number=#{orderNumber} and o.enabled=1
+	</select>
+	
+	<select id="findOrderById" resultMap="orderResultMap"
+		resultType="map">
+<!-- 		select id, order_number, user_id, service_id, vehicle_id,
+		detail_location,
+		book_time, order_time, completed_time, status_code, remarks,
+		price, invoice_status,
+		discounted_price, province_id, county_id,
+		city_id, district_id,
+		resi_quart_id, location_id, created_time
+		from oms_order where
+		id=#{id} -->
+		select o.id, o.order_number, o.user_id, o.service_id, o.vehicle_id, 
+		o.detail_location, 
+		o.book_time, o.order_time, o.completed_time, o.status_code, os.name as status, o.remarks, 
+		o.price, o.invoice_status, 
+		o.discounted_price, o.province_id, o.county_id, 
+		o.city_id, o.district_id, 
+		o.resi_quart_id, o.location_id, o.promotion_id, o.coupon_id, o.operator_id, o.created_time, o.order_phone_number, 
+		o.cap_type_id, o.store_id 
+		from oms_order as o left join oms_order_status as os on o.status_code=os.status_code 
+		where o.id=#{id} and o.enabled=1
+	</select>
+	
+	<select id="findLatestOrderByUserId" resultMap="orderResultMap"
+		resultType="map">
+<!-- 		select id, order_number, user_id, service_id, vehicle_id,
+		detail_location,
+		book_time, order_time, completed_time, status_code, remarks,
+		price, invoice_status,
+		discounted_price, province_id, county_id,
+		city_id, district_id,
+		resi_quart_id, location_id, created_time
+		from oms_order where
+		user_id=#{userId} order by completed_time desc limit 1 -->
+		select o.id, o.order_number, o.user_id, o.service_id, o.vehicle_id, 
+		o.detail_location, 
+		o.book_time, o.order_time, o.completed_time, o.status_code, os.name as status, o.remarks, 
+		o.price, o.invoice_status, 
+		o.discounted_price, o.province_id, o.county_id, 
+		o.city_id, o.district_id, 
+		o.resi_quart_id, o.location_id, o.promotion_id, o.coupon_id, o.operator_id, o.created_time, o.order_phone_number, o.store_id, 
+		o.cap_type_id   
+		from oms_order as o left join oms_order_status as os on o.status_code=os.status_code 
+		where 
+		o.user_id=#{userId} and o.enabled=1 order by o.order_time desc limit 1
+	</select>
+
+	<select id="listOrdersByUserId" resultMap="orderResultMap"
+		resultType="map">
+<!-- 		select id, order_number, user_id, service_id, vehicle_id,
+		detail_location,
+		book_time, order_time, completed_time, status_code, remarks,
+		price,
+		invoice_status,
+		discounted_price, province_id, county_id,
+		city_id, district_id, resi_quart_id, location_id, 
+		created_time
+		from oms_order where
+		user_id=#{userId} -->
+		select o.id, o.order_number, o.user_id, o.service_id, o.vehicle_id, 
+		o.detail_location, 
+		o.book_time, o.order_time, o.completed_time, o.status_code, os.name as status, o.remarks, 
+		o.price, o.invoice_status, 
+		o.discounted_price, o.province_id, o.county_id, 
+		o.city_id, o.district_id, 
+		o.resi_quart_id, o.location_id, o.promotion_id, o.coupon_id, o.operator_id, o.created_time, o.order_phone_number, 
+		o.cap_type_id, o.store_id  
+		from oms_order as o left join oms_order_status as os on o.status_code=os.status_code 
+		where 
+		o.user_id=#{userId} and o.enabled=1
+	</select>
+
+	<select id="listLimitedOrdersForUser" resultMap="orderResultMap"
+		resultType="map">
+<!-- 		select id, order_number, user_id, service_id, vehicle_id,
+		detail_location,
+		book_time, order_time, completed_time, status_code, remarks,
+		price,
+		invoice_status,
+		discounted_price, province_id, county_id,
+		city_id, district_id, resi_quart_id, location_id, 
+		created_time
+		from oms_order where
+		user_id=#{userId} order by created_time limit
+		#{count} -->
+		select o.id, o.order_number, o.user_id, o.service_id, o.vehicle_id, 
+		o.detail_location, 
+		o.book_time, o.order_time, o.completed_time, o.status_code, os.name as status, o.remarks, 
+		o.price, o.invoice_status, 
+		o.discounted_price, o.province_id, o.county_id, 
+		o.city_id, o.district_id, 
+		o.resi_quart_id, o.location_id, o.promotion_id, o.coupon_id, o.operator_id, o.created_time, o.order_phone_number, 
+		o.cap_type_id, o.store_id  
+		from oms_order as o left join oms_order_status as os on o.status_code=os.status_code 
+		where 
+		o.user_id=#{userId} and o.enabled=1 order by o.modified_time limit #{count}
+	</select>
+
+	<select id="listOrders" resultMap="orderResultMap" resultType="map">
+<!-- 		select id, order_number, user_id, service_id, vehicle_id,
+		detail_location,
+		book_time, order_time, completed_time, status_code, remarks,
+		price, invoice_status,
+		discounted_price, province_id, county_id,
+		city_id, district_id, 
+		resi_quart_id, location_id, created_time
+		from oms_order -->
+		select o.id, o.order_number, o.user_id, o.service_id, o.vehicle_id, 
+		o.detail_location, 
+		o.book_time, o.order_time, o.completed_time, o.status_code, os.name as status, o.remarks, 
+		o.price, o.invoice_status, 
+		o.discounted_price, o.province_id, o.county_id, 
+		o.city_id, o.district_id, 
+		o.resi_quart_id, o.location_id, o.promotion_id, o.coupon_id, o.operator_id, o.created_time, o.order_phone_number, 
+		o.cap_type_id, o.store_id  
+		from oms_order as o left join oms_order_status as os on o.status_code=os.status_code 
+		where o.enabled=1 order by o.modified_time desc
+	</select>
+
+	<select id="listOrdersInDays" resultMap="orderResultMap" resultType="map">
+<!-- 		select id, order_number, user_id, service_id, vehicle_id,
+		detail_location,
+		book_time, order_time, completed_time, status_code, remarks,
+		price, invoice_status,
+		discounted_price, province_id, county_id,
+		city_id, district_id, 
+		resi_quart_id, location_id, created_time
+		from oms_order -->
+		select o.id, o.order_number, o.user_id, o.service_id, o.vehicle_id, 
+		o.detail_location, 
+		o.book_time, o.order_time, o.completed_time, o.status_code, os.name as status, o.remarks, 
+		o.price, o.invoice_status, 
+		o.discounted_price, o.province_id, o.county_id, 
+		o.city_id, o.district_id, 
+		o.resi_quart_id, o.location_id, o.promotion_id, o.coupon_id, o.operator_id, o.created_time, o.order_phone_number, 
+		o.cap_type_id, o.store_id 
+		from oms_order as o left join oms_order_status as os on o.status_code=os.status_code 
+		where o.enabled=1 and 
+        <!-- PERIOD_DIFF(DATE_FORMAT(CURDATE(), '%Y%m%d'), DATE_FORMAT(o.created_time, '%Y%m%d')) &lt;= #{days} --> 
+        DATEDIFF(CURDATE(), o.created_time) &lt;= #{days} 
+		order by o.modified_time desc
+	</select>
+		
+	<!-- 一定时间内，status code > 0的 -->
+
+	<update id="updateOrder" parameterType="com.aawashcar.omsservice.entities.Order">
+		update oms_order set 
+		<if test="serviceId != null" >
+        	service_id=#{serviceId}, 
+      	</if>
+		<if test="vehicleId != null" >
+        	vehicle_id=#{vehicleId}, 
+      	</if>
+      	<if test="detailLocation != null" >
+        	detail_location=#{detailLocation}, 
+      	</if>
+      	<if test="bookTime != null" >
+        	book_time=#{bookTime}, 
+      	</if>
+      	<if test="orderTime != null" >
+        	order_time=#{orderTime}, 
+      	</if>
+      	<if test="completedTime != null" >
+        	completed_time=#{completedTime}, 
+      	</if>
+       	<if test="remarks != null" >
+        	remarks=#{remarks}, 
+      	</if>
+      	<if test="price != null" >
+        	price=#{price}, 
+      	</if>
+      	<if test="invoiceStatus != null" >
+        	invoice_status=#{invoiceStatus}, 
+      	</if>
+      	<if test="discountedPrice != null" >
+        	discounted_price=#{discountedPrice}, 
+      	</if>
+      	<if test="districtId != null" >
+        	district_id=#{districtId}, 
+      	</if>
+      	<if test="resiQuartId != null" >
+        	resi_quart_id=#{resiQuartId}, 
+      	</if>
+      	<if test="locationId != null" >
+        	location_id=#{locationId}, 
+      	</if>
+      	<if test="promotionId != null" >
+        	promotion_id=#{promotionId}, 
+      	</if>
+      	<if test="couponId != null" >
+        	coupon_id=#{couponId}, 
+      	</if> 
+      	<if test="operatorId != null" >
+      		operator_id=#{operatorId}, 
+      	</if>
+      	<if test="orderPhoneNumber != null" >
+      	    order_phone_number=#{orderPhoneNumber}, 
+      	</if>
+      	<if test="paymentType != null" >
+      		payment_type=#{paymentType}, 
+      	</if>
+      	status_code=#{statusCode} where id=#{id} and enabled=1
+	</update>
+
+	<update id="updateOrderStatus">
+		update oms_order 
+		set 
+		<if test="statusCode == -10" >
+			completed_time=CURRENT_TIMESTAMP, 
+		</if>
+		status_code=#{statusCode} 
+		where id=#{orderId}
+	</update>
+	
+	<update id="disableOrderById">
+		update oms_order 
+		set 
+		enabled=0 
+		where id=#{id}
+	</update>
+
+	<delete id="deleteOrderByOrderNumber">
+		delete from
+		oms_order where
+		order_number=#{orderNumber}
+	</delete>
+</mapper>

@@ -1,0 +1,37 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.opsservice.mappers.StoreMapper">
+	<resultMap id="storeResultMap" type="com.aawashcar.opsservice.entities.StoreEntity">
+		<id column="id" property="id" />
+		<result column="store_id" property="storeId" />
+		<result column="title" property="title" />
+		<result column="description" property="description" />
+		<result column="icon" property="icon" />
+		<result column="address" property="address" />
+		<result column="longitude" property="longitude" />
+		<result column="latitude" property="latitude" />
+		<result column="modified_time" property="modifiedTime" />
+		<result column="created_time" property="createdTime" />
+		<result column="enabled" property="enabled" />
+	</resultMap>
+
+<!-- 	<insert id="addCity" parameterType="com.aawashcar.opsservice.entities.City">
+		insert into ops_city
+		(city_id, name,
+		description, province_id, county_id) values (#{cityId},
+		#{name}, #{description},
+		#{provinceId}, #{countyId})
+	</insert> -->
+
+	<select id="findStore" resultMap="storeResultMap" resultType="map">
+		select id, store_id, title, description, icon, address, longitude, latitude, modified_time, 
+		created_time, enabled from ops_store where store_id = #{storeId} and enabled = 1
+	</select>
+	
+	<select id="listStores" resultMap="storeResultMap" resultType="map">
+		select id, store_id, title, description, icon, address, longitude, latitude, modified_time, 
+		created_time, enabled from ops_store where enabled = 1
+	</select>
+</mapper>

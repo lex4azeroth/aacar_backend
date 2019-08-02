@@ -1,0 +1,34 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.opsservice.mappers.LocationMapper">
+	<resultMap id="locationResultMap" type="com.aawashcar.opsservice.entities.Location">
+		<id column="id" property="id" />
+		<result column="detail_address" property="detailAddress" />
+		<result column="longitude" property="longitude" />
+		<result column="latitude" property="latitude" />
+		<result column="last_modified_time" property="lastModifiedTime" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addLocation" parameterType="com.aawashcar.opsservice.entities.Location">
+		insert into ops_location
+		(detail_address, longitude, latitude) values (#{detailAddress},
+		#{longitude}, #{latitude})
+	</insert>
+
+	<select id="findLocationById" resultMap="locationResultMap"
+		resultType="map">
+		select id, detail_address, longitude, latitude,
+		last_modified_time,
+		created_time from ops_location where id=#{id}
+	</select>
+
+	<update id="updateLocation" parameterType="com.aawashcar.opsservice.entities.Location">
+		update ops_location
+		set detail_address=#{detailAddress}, longitude=#{longitude},
+		latitude=#{latitude}
+		where id=#{id}
+	</update>
+</mapper>

@@ -1,0 +1,55 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.promservice.mappers.CouponMapper">
+	<resultMap id="couponResultMap" type="com.aawashcar.promservice.entities.Coupon">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="description" property="description" />
+		<result column="coupon_type" property="couponType" />
+		<result column="value" property="value" />
+		<result column="created_time" property="createdTime" />
+		<result column="enabled" property="enabled" />
+		<result column="duration" property="duration" />
+	</resultMap>
+
+	<insert id="addCoupon" parameterType="com.aawashcar.promservice.entities.Coupon">
+		insert into prom_coupon
+		(name, description, coupon_type, value, duration)
+		values
+		(#{name}, #{description}, #{couponType}, #{value}, #{duration}) 
+		<selectKey keyProperty="id" resultType="java.lang.Integer">
+			select LAST_INSERT_ID() as id
+      	</selectKey>
+	</insert>
+
+	<update id="disableCouponById">
+		update prom_coupon set enabled=0 where id=#{id}
+	</update>
+
+	<select id="listCoupons" resultMap="couponResultMap" resultType="map">
+		select id, name, description, coupon_type, value, enabled, duration, created_time from prom_coupon
+	</select>
+
+	<select id="findCouponById" resultMap="couponResultMap"
+		resultType="map">
+		select id, name, description, coupon_type, value, enabled, duration, created_time from prom_coupon 
+		where id=#{id}
+	</select>
+	
+	<select id="findMyCouponsByUserId" resultMap="couponResultMap" resultType="map">
+		select c.id, c.name, c.description, c.duration, c.coupon_type, c.value, c.enabled, c.created_time from prom_coupon c left join prom_r_user_coupon r on c.id = r.coupon_id 
+		where r.user_id=#{userId} and c.enabled = 1 and r.enabled = 1
+	</select>
+	
+	<select id="validateCoupon" resultMap="couponResultMap" resultType="map">
+		select c.id, c.name, c.description, c.coupon_type, c.value, 
+		c.created_time, c.duration, c.enabled from prom_coupon as c 
+		left join prom_r_user_coupon as ruc on c.id = ruc.coupon_id 
+		where ruc.user_id=#{userId} and ruc.coupon_id=#{couponId} and ruc.enabled=1 and 
+		<!-- PERIOD_DIFF(DATE_FORMAT(CURDATE(), '%Y%m'), DATE_FORMAT(ruc.created_time, '%Y%m')) &lt;= c.duration -->
+		<!-- DATEDIFF(CURDATE(), ruc.created_time) &lt;= c.duration -->
+		TIMESTAMPDIFF(MONTH, ruc.created_time, DATE_FORMAT(now(), '%Y-%m-%d')) &lt;= c.duration
+	</select>
+</mapper>

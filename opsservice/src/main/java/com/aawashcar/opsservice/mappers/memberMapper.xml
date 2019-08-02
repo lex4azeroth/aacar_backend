@@ -1,0 +1,36 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.opsservice.mappers.MemberMapper">
+	<resultMap id="memberResultMap" type="com.aawashcar.opsservice.entities.Member">
+		<id column="id" property="id" />
+		<result column="promotion_id" property="promotionId" />
+		<result column="enabled" property="enabled" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addMember" parameterType="com.aawashcar.opsservice.entities.Member">
+		insert into ops_member
+		(promotion_id, name, description, enabled) values
+		(#{promotionId},
+		#{name}, #{description},
+		#{enabled})
+	</insert>
+
+	<update id="updatePromotionId">
+		update ops_member set promotion_id=#{promotionId}
+		where id=#{id}
+	</update>
+
+	<update id="updateMemberStatus">
+		update ops_member set enabled=#{enabled} where
+		id=#{id}
+	</update>
+
+	<select id="listMembers" resultMap="memberResultMap" resultType="map">
+		select id, promotion_id, name, description, enabled,
+		created_time from
+		ops_member
+	</select>
+</mapper>

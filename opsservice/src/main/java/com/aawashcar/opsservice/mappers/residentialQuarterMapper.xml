@@ -1,0 +1,45 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.opsservice.mappers.ResidentialQuarterMapper">
+	<resultMap id="residentialQuarterResultMap" type="com.aawashcar.opsservice.entities.ResidentialQuarter">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="resi_quat_id" property="resiQuatId" />
+		<result column="description" property="description" />
+		<result column="city_id" property="cityId" />
+		<result column="province_id" property="provinceId" />
+		<result column="county_id" property="countyId" />
+		<result column="district_id" property="districtId" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+
+	<insert id="addResidentialQuarter" parameterType="com.aawashcar.opsservice.entities.ResidentialQuarter">
+		insert into ops_residential_quarter
+		(resi_quat_id, name,
+		description, province_id, county_id, city_id, district_id) values (#{resiQuatId}, 
+		#{name}, #{description},
+		#{provinceId}, #{countyId}, #{cityId}, #{districtId})
+	</insert>
+
+	<delete id="deleteResidentialQuarterById" parameterType="int">
+		delete from ops_residential_quarter where
+		resi_quat_id=#{resiQuatId}
+	</delete>
+
+	<select id="findResidentialQuarterById" resultMap="residentialQuarterResultMap" resultType="map">
+		select id, resi_quat_id, name, description, province_id, county_id, city_id, district_id, 
+		created_time from ops_residential_quarter where resi_quat_id = #{resiQuatId}
+	</select>
+	
+	<select id="findResidentialQuarterByName" resultMap="residentialQuarterResultMap" resultType="map">
+		select id, resi_quat_id, name, description, province_id, county_id, city_id, district_id, 
+		created_time from ops_residential_quarter where name = #{name}
+	</select>
+
+	<select id="listResidentialQuarter" resultMap="residentialQuarterResultMap" resultType="map">
+		select id, resi_quat_id, name, description, province_id, county_id, city_id, district_id, 
+		created_time from ops_residential_quarter where province_id = #{provinceId} and city_id = #{cityId} and district_id = #{districtId}
+	</select>
+</mapper>

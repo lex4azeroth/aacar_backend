@@ -1,0 +1,82 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aawashcar.capservice.mappers.CapabilityMapper">
+	<resultMap id="capabilityResultMap" type="com.aawashcar.capservice.entities.Capability">
+		<id column="id" property="id" />
+		<result column="service_id" property="serviceId" />
+		<result column="name" property="name" />
+		<result column="description" property="description" />
+		<result column="cleanning_part" property="cleanningPart" />
+		<result column="time_consuming" property="timeConsuming" />
+		<result column="consumables" property="consumables" />
+		<result column="standard" property="standard" />
+		<result column="created_time" property="createdTime" />
+		<result column="modified_time" property="modifiedTime" />
+		<result column="icon_url" property="iconUrl" />
+		<result column="enabled" property="enabled" />
+		<result column="category_id" property="categoryId" />
+		<result column="category_name" property="categoryName" />
+		<result column="category_url" property="categoryUrl" />
+	</resultMap>
+
+	<insert id="addCapability" parameterType="com.aawashcar.capservice.entities.Capability">
+		insert into cap_service 
+		(service_id, name, description, cleanning_part, time_consuming, consumables, standard, 
+		<if test="iconUrl != null" >
+			icon_url, 
+		</if> 
+		enabled)
+		values
+		(#{serviceId}, #{name}, #{description}, #{cleanningPart}, #{timeConsuming}, #{consumables}, #{standard}, 
+		<if test="iconUrl != null" >
+			#{iconUrl}, 
+		</if>
+		1) 
+		<selectKey keyProperty="id" resultType="java.lang.Integer">
+			select LAST_INSERT_ID() as id
+      	</selectKey>
+	</insert>
+
+	<select id="findCapabilities" resultMap="capabilityResultMap" resultType="map">
+		select s.id, s.service_id, s.name, s.description, s.cleanning_part, s.time_consuming, s.consumables, s.standard, 
+		s.created_time, s.modified_time, s.icon_url, s.enabled, sc.id as category_id, sc.name as category_name, sc.icon_url as category_url 
+		from cap_service as s left join cap_service_category as sc on s.category_id = sc.id where s.enabled = 1
+	</select>
+
+	<select id="findCapability" resultMap="capabilityResultMap" resultType="map">
+		select s.id, s.service_id, s.name, s.description, s.cleanning_part, s.time_consuming, s.consumables, s.standard, 
+		s.created_time, s.modified_time, s.icon_url, s.enabled, sc.id as category_id, sc.name as category_name, sc.icon_url as category_url 
+		from cap_service as s left join cap_service_category as sc on s.category_id = sc.id where s.enabled = 1 and s.id = #{id}
+	</select>
+		
+	<update id="updateCapability" parameterType="com.aawashcar.capservice.entities.Capability">
+		update cap_service set 
+		<if test="serviceId != null" >
+        	service_id=#{serviceId}, 
+      	</if>
+      	<if test="name != null" >
+        	name=#{name}, 
+      	</if>
+      	<if test="description != null" >
+        	description=#{description}, 
+      	</if>
+      	<if test="cleanningPart != null" >
+        	cleanning_part=#{cleanningPart}, 
+      	</if>
+      	<if test="timeConsuming != null" >
+        	time_consuming=#{timeConsuming}, 
+      	</if>
+      	<if test="consumables != null" >
+        	consumables=#{consumables}, 
+      	</if>
+      	<if test="standard != null" >
+        	standard=#{standard}, 
+      	</if>
+      	<if test="iconUrl != null" >
+        	icon_url=#{iconUrl}, 
+      	</if>
+      	modified_time=CURRENT_TIMESTAMP where id = #{id}
+	</update>
+</mapper>
